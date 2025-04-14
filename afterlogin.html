@@ -4,9 +4,12 @@
   <title>Welcome</title>
 </head>
 <body>
+  <h1>Discuss the theory of plate tectonics</h1> <!-- Added text -->
+  
   <h1>Write a comment</h1>
   <!-- Form for submitting new comments -->
   <form id="commentForm">
+    <input type="hidden" id="csrfToken" name="_csrf">
     <input name="comment" placeholder="Comment" required />
     <button type="submit">Submit</button>
   </form>
@@ -14,6 +17,7 @@
   <!-- Search bar -->
   <h2>Search Comments by User</h2>
   <form action="/search" method="GET">
+    <input type="hidden" name="_csrf" id="searchCsrfToken">
     <input name="username" placeholder="Enter username" required>
     <button type="submit">Search</button>
   </form>
@@ -21,58 +25,7 @@
   <!-- List to display comments -->
   <ul id="commentList"></ul>
 
-  <script>
-    // Function to load and display comments from the server.js
-    async function loadComments() {
-      const res = await fetch('/comments');
-      const comments = await res.json();
-      const list = document.getElementById('commentList');
-      list.innerHTML = '';
-      comments.forEach(c => {
-        const item = document.createElement('li');
-        // Display each comment with options to delete or edit
-        item.innerHTML = `
-          <strong>${c.name}:</strong> <span>${c.comment}</span>
-          <button onclick="deleteComment(${c.id})">Delete</button>
-          <button onclick="editComment(${c.id}, '${c.comment.replace(/'/g, "\\'")}')">Edit</button>
-        `;
-        list.appendChild(item);
-      });
-    }
-
-    // Event listener for posting a new comment
-    document.getElementById('commentForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      await fetch('/create', {
-        method: 'POST',
-        body: new URLSearchParams(formData)
-      });
-      e.target.reset();
-      loadComments();
-    });
-
-    // Delete comment
-    async function deleteComment(id) {
-      await fetch(`/delete/${id}`, { method: 'POST' });
-      loadComments();
-    }
-
-    // Edit comment
-    async function editComment(id, oldComment) {
-      const newComment = prompt('Edit your comment:', oldComment);
-      if (newComment !== null && newComment.trim() !== '') {
-        await fetch(`/update/${id}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ comment: newComment })
-        });
-        loadComments();
-      }
-    }
-
-    // Load comments on page load
-    loadComments();
-  </script>
+  <!-- Link to external JavaScript file -->
+  <script src="afterlogin.js"></script>
 </body>
 </html>
